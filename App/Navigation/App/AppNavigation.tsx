@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
+import {HomeScreen} from '../../Containers';
 
 const Stack = createStackNavigator();
 
@@ -12,13 +13,13 @@ const AppNavigation: React.FC = () => {
         title: '',
       }}
     >
-      {/* <Stack.Screen
+      <Stack.Screen
         name="HomeScreen"
-        component={Splash}
+        component={HomeScreen}
         options={{
           headerShown: false,
         }}
-      /> */}
+      />
     </Stack.Navigator>
   );
 };
