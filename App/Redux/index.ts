@@ -6,6 +6,8 @@ import ReactotronConfig from '../../ReactotronConfig';
 
 import appReducer from './App/AppSlice';
 
+import permissionReducer from './Permissions/PermissionsSlice';
+
 import REDUX_PERSIST from './ReduxPersist';
 
 const appConfig = {
@@ -16,6 +18,7 @@ const appConfig = {
 
 const reducers = combineReducers({
   app: persistReducer(appConfig, appReducer),
+  permissions: permissionReducer,
 });
 
 const persistConfig = REDUX_PERSIST;
