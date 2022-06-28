@@ -1,64 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Dimensions } from 'react-native';
+import { SafeAreaView, View, Dimensions, Text } from 'react-native';
 
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
-} from "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
 
 import SelectDropdown from 'react-native-select-dropdown'
 import { batch } from 'react-redux';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../Hooks/Redux/Redux';
-import { getAllCurrencies, getRatioBetweenCurrencies, getRatioBetweenCurrenciesFiveYearsBack, getRatioBetweenCurrenciesInDate, getRatioBetweenCurrenciesOneDayBack, getRatioBetweenCurrenciesOneMonthBack, getRatioBetweenCurrenciesOneYearBack, getRatioBetweenCurrenciesThreeMonthsBack } from '../../Redux/App/AppSlice';
+
+import {
+  getAllCurrencies,
+  getRatioBetweenCurrenciesFiveYearsBack,
+  getRatioBetweenCurrenciesOneDayBack,
+  getRatioBetweenCurrenciesOneMonthBack,
+  getRatioBetweenCurrenciesOneYearBack,
+  getRatioBetweenCurrenciesThreeMonthsBack
+} from '../../Redux/App/AppSlice';
 
 import styles from './HomeScreen.styles';
 
 type HomeScreenState = {
-  currentCurrencies: {},
   firstCurrency: string | undefined,
   secondCurrency: string | undefined,
-  ratio: Number | undefined
-  data: any[]
+  data: any[],
 };
 
 const HomeScreen = () => {
   const [state, setState] = useState<HomeScreenState>({
-    currentCurrencies: [],
     firstCurrency: '',
     secondCurrency: '',
-    ratio: 1,
-    data: [1, 2, 3, 4, 5, 6]
+    data: [1, 2, 3, 4, 5, 6],
   });
 
-  const { currentCurrencies, firstCurrency, secondCurrency, ratio, data } = state;
+  const { firstCurrency, secondCurrency, data } = state;
 
   const dispatch = useAppDispatch();
 
-  const { currencies, currencyRatio, oneDayBack, oneMonthBack, threeMonthsBack, fiveYearsBack } = useAppSelector(selector => selector.app);
-
+  const { currencies,
+    oneDayBack,
+    oneMonthBack,
+    threeMonthsBack,
+    fiveYearsBack,
+    loading } = useAppSelector(selector => selector.app);
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      currentCurrencies: currencies
-    }))
+    getGraphData();
+  }, [firstCurrency, secondCurrency])
 
-
-    if (firstCurrency && secondCurrency) {
-      dispatch(getRatioBetweenCurrencies({ firstCurrency, secondCurrency }));
-    }
-    if (currencyRatio) {
-      setState((prevState) => ({
-        ...prevState,
-        ratio: currencyRatio.ratio
-      }))
-    }
-  }, [currencies, firstCurrency, secondCurrency])
+  useEffect(() => {
+    dispatch(getAllCurrencies());
+  }, [])
 
   const getGraphData = () => {
     if (firstCurrency && secondCurrency) {
@@ -77,30 +68,24 @@ const HomeScreen = () => {
         dispatch(getRatioBetweenCurrenciesFiveYearsBack({ firstCurrency, secondCurrency, time: fiveYearsBackDate }));
       })
 
-      setState((prevState) => ({
-        ...prevState,
-        data: [Number(oneDayBack), Number(oneMonthBack), Number(threeMonthsBack), Number(fiveYearsBack)]
-      }));
+      if (!loading) {
+        setState((prevState) => ({
+          ...prevState,
+          data: [Number(oneDayBack), Number(oneMonthBack), Number(threeMonthsBack), Number(fiveYearsBack)]
+        }));
+      }
     }
   }
-
-  useEffect(() => {
-    getGraphData()
-  }, [firstCurrency, secondCurrency, ratio])
-
-  useEffect(() => {
-    dispatch(getAllCurrencies());
-  }, [])
 
   const renderSelectCurrencyButtons = () => {
     return (
       <View style={styles.selectionsContainer}>
         <SelectDropdown
-          data={Object.values(currentCurrencies)}
+          data={Object.values(currencies)}
           onSelect={(selectedItem, index) => {
             setState((prevState) => ({
               ...prevState,
-              firstCurrency: Object.keys(currentCurrencies).find(key => currentCurrencies[key] === selectedItem),
+              firstCurrency: Object.keys(currencies)[index],
             }))
           }}
           buttonStyle={styles.button}
@@ -113,11 +98,11 @@ const HomeScreen = () => {
           }}
         />
         <SelectDropdown
-          data={Object.values(currentCurrencies)}
+          data={Object.values(currencies)}
           onSelect={(selectedItem, index) => {
             setState((prevState) => ({
               ...prevState,
-              secondCurrency: Object.keys(currentCurrencies).find(key => currentCurrencies[key] === selectedItem),
+              secondCurrency: Object.keys(currencies)[index],
             }))
           }}
           defaultButtonText={'currency 2'}
@@ -145,20 +130,18 @@ const HomeScreen = () => {
             }
           ]
         }}
-        width={Dimensions.get("window").width} // from react-native
+        width={Dimensions.get("window").width}
         height={Dimensions.get("window").height * 0.5}
-        // yAxisLabel="$"
-        // yAxisSuffix="k"
-        yAxisInterval={1} // optional, defaults to 1
+        yAxisInterval={1}
         chartConfig={{
-          backgroundColor: "#e26a00",
-          backgroundGradientFrom: "#fb8c00",
-          backgroundGradientTo: "#ffa726",
-          decimalPlaces: 2, // optional, defaults to 2dp
+          backgroundColor: "green",
+          backgroundGradientFrom: "red",
+          backgroundGradientTo: "blue",
+          decimalPlaces: 2,
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           style: {
-            borderRadius: 16
+            borderRadius: 30
           },
           propsForDots: {
             r: "6",
@@ -167,19 +150,14 @@ const HomeScreen = () => {
           }
         }}
         bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 16
-        }}
+        style={styles.graph}
       />
     )
   }
 
   return <SafeAreaView style={styles.container}>
     {renderSelectCurrencyButtons()}
-
     {renderGraph()}
-
   </SafeAreaView>;
 };
 

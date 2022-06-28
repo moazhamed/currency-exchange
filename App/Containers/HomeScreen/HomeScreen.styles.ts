@@ -14,6 +14,18 @@ export default StyleSheet.create({
         marginTop: height * 0.02
     },
     button: {
-        width: width * 0.45
+        width: width * 0.45,
+        borderRadius: 15,
+        marginTop: height * 0.05
     },
+    currencyRatio: {
+        alignSelf: 'center',
+        fontSize: 20,
+        color: 'blue',
+        justifyContent: 'center'
+    },
+    graph: {
+        marginVertical: 50,
+        borderRadius: 30
+    }
 });

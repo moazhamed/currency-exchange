@@ -12,7 +12,7 @@ interface AppState {
   threeMonthsBack: string,
   oneYearBack: string,
   fiveYearsBack: string,
-  currencyRatio: { date: string, ratio: Number }
+  currencyRatio: { date: string, ratio: string }
 }
 
 const initialState = {
@@ -30,15 +30,6 @@ export const getAllCurrencies = createAsyncThunk(
   'app/currencies',
   async () => {
     const response = await currencyService.getAllCurrencies();
-    return response.data;
-  },
-);
-
-export const getRatioBetweenCurrencies = createAsyncThunk(
-  'app/currencies/ratio',
-  async (data: any) => {
-    const { firstCurrency, secondCurrency, time } = data;
-    const response = await currencyService.getRatioBetweenTwoCurrencies(firstCurrency, secondCurrency, time);
     return response.data;
   },
 );
@@ -106,16 +97,6 @@ const appSlice = createSlice({
       .addCase(getAllCurrencies.fulfilled, (state, action) => {
         state.loading = false;
         state.currencies = action.payload;
-      })
-      .addCase(getRatioBetweenCurrencies.pending, state => {
-        state.loading = true;
-      })
-      .addCase(getRatioBetweenCurrencies.rejected, state => {
-        state.loading = false;
-      })
-      .addCase(getRatioBetweenCurrencies.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currencyRatio = action.payload;
       }).addCase(getRatioBetweenCurrenciesOneDayBack.pending, state => {
         state.loading = true;
       }).addCase(getRatioBetweenCurrenciesOneDayBack.rejected, state => {
