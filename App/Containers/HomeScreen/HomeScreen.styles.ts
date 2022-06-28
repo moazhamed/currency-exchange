@@ -15,5 +15,5 @@ export default StyleSheet.create({
     },
     button: {
         width: width * 0.45
-    }
+    },
 });

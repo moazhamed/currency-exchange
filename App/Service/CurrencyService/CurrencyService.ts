@@ -11,6 +11,9 @@ class CurrencyService {
   getRatioBetweenTwoCurrencies(firstCurrency: string, secondCurrency: string): Promise<AxiosResponse> {
     return axiosInstance.get(ApiUrlConstants.currencyWithRespectToAnother(firstCurrency, secondCurrency))
   }
+  getRatioBetweenCurrenciesInDate(firstCurrency: string, secondCurrency: string, time: any): Promise<AxiosResponse>{
+    return axiosInstance.get(ApiUrlConstants.getRatioBetweenCurrenciesInDate(firstCurrency,secondCurrency,time));
+  }
 }
 
 export default new CurrencyService();
